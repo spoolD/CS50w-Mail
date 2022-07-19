@@ -37,7 +37,32 @@ function load_mailbox(mailbox) {
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 }
 
-function send_email() {
+function send_email(event) {
+  // Prevent redirection of form
+  event.preventDefault();
+
+  // Get values from form
+  var recipients = document.getElementById('compose-recipients').value
+  if (recipients.includes(',')){
+    recipients = recipients.split(',')
+  }
+  var subject = document.getElementById('compose-subject').value;
+  var body = document.getElementById('compose-body').value;
   
+  // Send POST request to /emails to send
+  fetch('/emails', {
+    method: 'POST',
+    body: JSON.stringify({
+      recipients: recipients,
+      subject: subject,
+      body: body
+    })
+  })
+  .then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  
+  // Load user's sent mailbox
   load_mailbox('sent');
 }
