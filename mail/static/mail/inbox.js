@@ -11,8 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // By default, load the inbox
   load_mailbox('inbox');
-
-  
 });
 
 function compose_email() {
@@ -35,6 +33,35 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // Send GET request to get emails
+  fetch('/emails/' + mailbox)
+  .then(response => response.json())
+  .then(emails => {
+    Object.values(emails).forEach(email => {
+      console.log(email.subject);
+      
+      
+      const emailSubject = document.createElement('div')
+      emailSubject.innerHTML = email.subject;
+      const emailSender = document.createElement('div')
+      emailSender.innerHTML = email.sender;
+      const emailTimeStamp = document.createElement('div')
+      emailTimeStamp.innerHTML = email.timestamp;
+
+      const emailParent = document.createElement('div');
+      if (email.read === true){
+        emailParent.className = 'email-read';
+      }
+      {
+        emailParent.className = 'email-unread';
+      }
+      
+      emailParent.append(emailSender, emailSubject, emailTimeStamp);
+      document.querySelector('#emails-view').append(emailParent);
+
+    });
+  })
 }
 
 function send_email(event) {
@@ -42,12 +69,12 @@ function send_email(event) {
   event.preventDefault();
 
   // Get values from form
-  var recipients = document.getElementById('compose-recipients').value
+  let recipients = document.getElementById('compose-recipients').value
   if (recipients.includes(',')){
     recipients = recipients.split(',')
   }
-  var subject = document.getElementById('compose-subject').value;
-  var body = document.getElementById('compose-body').value;
+  let subject = document.getElementById('compose-subject').value;
+  let body = document.getElementById('compose-body').value;
   
   // Send POST request to /emails to send
   fetch('/emails', {
