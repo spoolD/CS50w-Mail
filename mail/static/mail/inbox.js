@@ -30,6 +30,7 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#detail-view').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -39,9 +40,9 @@ function load_mailbox(mailbox) {
   .then(response => response.json())
   .then(emails => {
     Object.values(emails).forEach(email => {
-      console.log(email.subject);
+      //console.log(email.subject);
       
-      
+      // Create HTML structure for emails
       const emailSubject = document.createElement('div')
       emailSubject.innerHTML = email.subject;
       const emailSender = document.createElement('div')
@@ -49,19 +50,22 @@ function load_mailbox(mailbox) {
       const emailTimeStamp = document.createElement('div')
       emailTimeStamp.innerHTML = email.timestamp;
 
+      // Change class name based on whether read/unread
       const emailParent = document.createElement('div');
       if (email.read === true){
         emailParent.className = 'email-read';
       }
-      {
+      else {
         emailParent.className = 'email-unread';
       }
       
+      // Add email to DOM and add event listener for displaying email
       emailParent.append(emailSender, emailSubject, emailTimeStamp);
+      emailParent.addEventListener('click', () => load_email(email.id))
       document.querySelector('#emails-view').append(emailParent);
 
     });
-  })
+  });
 }
 
 function send_email(event) {
@@ -88,8 +92,45 @@ function send_email(event) {
   .then(response => response.json())
   .then(result => {
     console.log(result);
-  })
+  });
   
   // Load user's sent mailbox
   load_mailbox('sent');
+}
+
+function load_email(id) {
+  // Hide mailbox section and show detailed view section in HTML
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#detail-view').style.display = 'block';
+
+  // Send a GET request to /emails/<emails_id>
+  fetch('/emails/' + id)
+  .then(response => response.json())
+  .then(email => {
+    //console.log(email);
+    //create sections in html to populate rather than creating new
+    const sender = document.createElement('div')
+    sender.innerHTML = email.sender;
+    const recipients = document.createElement('div')
+    recipients.innerHTML = email.recipients;
+    const subject = document.createElement('div')
+    subject.innerHTML = email.subject;
+    const timeStamp = document.createElement('div')
+    timeStamp.innerHTML = email.timestamp;
+    const body = document.createElement('div')
+    body.innerHTML = email.body;
+    const parent = document.createElement('div');
+    parent.append(sender, recipients, subject, timeStamp, body);
+    document.querySelector('#detail-view').append(parent);
+    
+  });
+
+  // Send a PUT request to mark email as read
+  fetch('/emails/' + id, {
+    method: 'PUT',
+    body: JSON.stringify({
+      read: true
+    })
+  });
+  
 }
