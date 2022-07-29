@@ -18,6 +18,7 @@ function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
+  document.querySelector('#detail-view').style.display = 'none';
 
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
@@ -61,7 +62,7 @@ function load_mailbox(mailbox) {
       
       // Add email to DOM and add event listener for displaying email
       emailParent.append(emailSender, emailSubject, emailTimeStamp);
-      emailParent.addEventListener('click', () => load_email(email.id))
+      emailParent.addEventListener('click', () => load_email(email.id, mailbox))
       document.querySelector('#emails-view').append(emailParent);
 
     });
@@ -98,7 +99,8 @@ function send_email(event) {
   load_mailbox('sent');
 }
 
-function load_email(id) {
+function load_email(id, mailbox) {
+ 
   // Hide mailbox section and show detailed view section in HTML
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#detail-view').style.display = 'block';
@@ -113,6 +115,24 @@ function load_email(id) {
     document.querySelector('#subject').innerHTML = email.subject;
     document.querySelector('#timestamp').innerHTML = email.timestamp;
     document.querySelector('#body').innerHTML = email.body;
+
+    // Display Archive/Unarchive if in inbox
+    let archiveButton = document.querySelector('#archive-button');
+    if (mailbox === 'inbox'){
+      archiveButton.style.display = 'block';
+
+      // Change text of button depending on whether email is archived
+      if (email.archived){
+        archiveButton.innerHTML = 'Unarchive';
+      }
+      else{
+        archiveButton.innerHTML = 'Archive';
+      }
+      
+    }
+    else {
+      archiveButton.style.display = 'none';
+    }
   });
 
   // Send a PUT request to mark email as read
@@ -122,5 +142,5 @@ function load_email(id) {
       read: true
     })
   });
-  
+
 }
