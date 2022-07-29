@@ -15,3 +15,7 @@ textarea {
 .email-read {
     background-color: rgb(212, 212, 212);
 }
+
+div p {
+    display: inline;
+}

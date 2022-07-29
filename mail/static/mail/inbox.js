@@ -108,21 +108,11 @@ function load_email(id) {
   .then(response => response.json())
   .then(email => {
     //console.log(email);
-    //create sections in html to populate rather than creating new
-    const sender = document.createElement('div')
-    sender.innerHTML = email.sender;
-    const recipients = document.createElement('div')
-    recipients.innerHTML = email.recipients;
-    const subject = document.createElement('div')
-    subject.innerHTML = email.subject;
-    const timeStamp = document.createElement('div')
-    timeStamp.innerHTML = email.timestamp;
-    const body = document.createElement('div')
-    body.innerHTML = email.body;
-    const parent = document.createElement('div');
-    parent.append(sender, recipients, subject, timeStamp, body);
-    document.querySelector('#detail-view').append(parent);
-    
+    document.querySelector('#sender').innerHTML = email.sender;
+    document.querySelector('#recipients').innerHTML= email.recipients;
+    document.querySelector('#subject').innerHTML = email.subject;
+    document.querySelector('#timestamp').innerHTML = email.timestamp;
+    document.querySelector('#body').innerHTML = email.body;
   });
 
   // Send a PUT request to mark email as read
