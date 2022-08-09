@@ -96,7 +96,6 @@ function send_email(event) {
   });
   
   // Load user's sent mailbox
-  window.location.reload()
   load_mailbox('sent');
 }
 
